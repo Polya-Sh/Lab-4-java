@@ -1,28 +1,51 @@
 package core;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+
 
 public class FileUtils {
 
-    List<String> list1 =new ArrayList();
-    public List<String> ReaderFiles(String path){
-        try
-        {
-            BufferedReader reader = new BufferedReader(new FileReader(path));
-            List<String> list1 = new ArrayList<>();
-            String line1 = reader.readLine();
-            while (line1 != null) {
-                list1.add(line1);
+
+    public static List<String> readLines(String filename) throws IOException {
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
             }
-            return list1;
         }
-        catch(IOException ex){
-            System.out.println(ex.getMessage());
+        return lines;
+    }
+
+    public static void writeLines(String filename, List<String> lines) throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(filename))) {
+            for (String line : lines) {
+                writer.write(line);
+                writer.newLine();
+            }
         }
-        return List.of();
+    }
+
+    public static List<Integer> readNumbers(String filename) throws IOException {
+        List<Integer> numbers = new ArrayList<>();
+        List<String> lines = readLines(filename);
+        for (String line : lines) {
+            try {
+                numbers.add(Integer.parseInt(line.trim()));
+            } catch (NumberFormatException e) {
+                System.err.println("Пропущена некорректная строка: " + line);
+            }
+        }
+        return numbers;
+    }
+
+    public static void writeNumbers(String filename, List<Integer> numbers) throws IOException {
+        List<String> lines = new ArrayList<>();
+        for (Integer num : numbers) {
+            lines.add(String.valueOf(num));
+        }
+        writeLines(filename, lines);
     }
 }
